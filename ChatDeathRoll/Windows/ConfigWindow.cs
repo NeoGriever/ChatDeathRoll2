@@ -35,6 +35,41 @@ public class ConfigWindow : Window
         }
 
         ImGui.PushStyleVar(ImGuiStyleVar.IndentSpacing, 5);
+        if (ImGui.CollapsingHeader("Settings##settings"))
+        {
+            ImGui.Indent();
+            ImGui.TextWrapped("This option deactivates the /random and/or /dice replacement, as one open plugin window matches the regular expression below.");
+
+            var windowExclusionEnabled = Config.WindowExclusionEnabled;
+            if (ImGui.Checkbox("Enabled##windowExclusionEnabled", ref windowExclusionEnabled))
+            {
+                Config.WindowExclusionEnabled = windowExclusionEnabled;
+                Config.Save();
+            }
+
+            var windowExclusionTitleRegex = Config.WindowExclusionTitleRegex;
+            if (ImGui.InputText("##windowExclusionTitleRegex", ref windowExclusionTitleRegex, ushort.MaxValue))
+            {
+                Config.WindowExclusionTitleRegex = windowExclusionTitleRegex;
+                Config.Save();
+            }
+
+            var excludeRandomWhenWindowOpen = Config.ExcludeRandomWhenWindowOpen;
+            if (ImGui.Checkbox("/random##excludeRandomWhenWindowOpen", ref excludeRandomWhenWindowOpen))
+            {
+                Config.ExcludeRandomWhenWindowOpen = excludeRandomWhenWindowOpen;
+                Config.Save();
+            }
+
+            var excludeDiceWhenWindowOpen = Config.ExcludeDiceWhenWindowOpen;
+            if (ImGui.Checkbox("/dice##excludeDiceWhenWindowOpen", ref excludeDiceWhenWindowOpen))
+            {
+                Config.ExcludeDiceWhenWindowOpen = excludeDiceWhenWindowOpen;
+                Config.Save();
+            }
+            ImGui.Unindent();
+        }
+
         if (ImGui.CollapsingHeader("General##general", ImGuiTreeNodeFlags.DefaultOpen))
         {
             ImGui.Indent();
@@ -62,6 +97,7 @@ public class ConfigWindow : Window
                 Config.MaxActiveLinks = maxActiveLinks;
                 Config.Save();
             }
+
             ImGui.Unindent();
         }
 

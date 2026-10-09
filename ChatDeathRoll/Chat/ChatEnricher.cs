@@ -1,4 +1,5 @@
 using ChatDeathRoll.Chat;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,6 +71,8 @@ public partial class ChatEnricher : IDisposable
     private IPlayerState PlayerState { get; init; }
     private Config Config { get; init; }
     private IPluginLog PluginLog { get; init; }
+    private string? CachedWindowExclusionTitleRegexPattern { get; set; }
+    private Regex? CachedWindowExclusionTitleRegex { get; set; }
 
     public ChatEnricher(IChatGui chatGui, ChatLinks chatLinks, ChatSender chatSender, IPlayerState playerState, Config config, IPluginLog pluginLog)
     {
@@ -93,6 +97,11 @@ public partial class ChatEnricher : IDisposable
         {
             if (TryParseRollMessage(message.LogKind, message.Sender, message.Message, out var senderName, out var rollType, out var rollValue))
             {
+                if (ShouldSkipRollReplacement(rollType) && IsExclusionWindowOpen())
+                {
+                    return;
+                }
+
                 var messageBuilder = new SeStringBuilder();
                 var messageFormatParts = MessageFormatSplitGeneratedRegex().Split(Config.MessageFormat);
 
@@ -168,6 +177,70 @@ public partial class ChatEnricher : IDisposable
                 }
             }
         }
+    }
+
+    private bool ShouldSkipRollReplacement(RollType rollType)
+    {
+        return Config.WindowExclusionEnabled &&
+            (rollType == RollType.Random && Config.ExcludeRandomWhenWindowOpen ||
+             rollType == RollType.Dice && Config.ExcludeDiceWhenWindowOpen);
+    }
+
+    private unsafe bool IsExclusionWindowOpen()
+    {
+        var pattern = Config.WindowExclusionTitleRegex;
+        if (string.IsNullOrWhiteSpace(pattern) || pattern.Length < 3)
+        {
+            return false;
+        }
+
+        if (CachedWindowExclusionTitleRegexPattern != pattern)
+        {
+            CachedWindowExclusionTitleRegexPattern = pattern;
+            try
+            {
+                CachedWindowExclusionTitleRegex = new Regex(pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+            }
+            catch (ArgumentException exception)
+            {
+                CachedWindowExclusionTitleRegex = null;
+                PluginLog.Warning(exception, "Ignoring invalid roll exclusion window title regular expression");
+            }
+        }
+
+        if (CachedWindowExclusionTitleRegex == null)
+        {
+            return false;
+        }
+
+        var context = ImGui.GetCurrentContext();
+        if (context.IsNull)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < context.Windows.Size; index++)
+        {
+            var window = context.Windows[index];
+            if (!window.IsNull && window.Active)
+            {
+                var windowTitle = Marshal.PtrToStringUTF8((nint)window.Name);
+                try
+                {
+                    if (windowTitle != null && CachedWindowExclusionTitleRegex.IsMatch(windowTitle))
+                    {
+                        return true;
+                    }
+                }
+                catch (RegexMatchTimeoutException exception)
+                {
+                    PluginLog.Warning(exception, "Timed out matching roll exclusion window title regular expression");
+                    return false;
+                }
+            }
+        }
+
+        return false;
     }
 
     private bool TryParseRollMessage(XivChatType chatType, SeString sender, SeString message, out string senderName, out RollType rollType, out int rollValue)

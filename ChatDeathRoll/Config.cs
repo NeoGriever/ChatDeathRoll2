@@ -24,6 +24,11 @@ public class Config : IPluginConfiguration
 
     public int MaxActiveLinks { get; set; } = 10;
 
+    public bool WindowExclusionEnabled { get; set; } = true;
+    public string WindowExclusionTitleRegex { get; set; } = @"^SimpleBlackjack \d+.*$";
+    public bool ExcludeRandomWhenWindowOpen { get; set; } = false;
+    public bool ExcludeDiceWhenWindowOpen { get; set; } = true;
+
     public bool MessageFormatValid()
     {
         try
