@@ -2,7 +2,11 @@
 
 Provides roll buttons in chat for death rolling and display results.
 
-Installable using my custom repository (instructions here: https://github.com/anya-hichu/DalamudPluginRepo) or from compiled archives.
+This is a fork of the original [ChatDeathRoll](https://github.com/anya-hichu/ChatDeathRoll) plugin.
+
+Install it by adding this custom repository URL to Dalamud:
+
+`https://raw.githubusercontent.com/NeoGriever/ChatDeathRoll2/master/repo.json`
 
 ## Changes
 
