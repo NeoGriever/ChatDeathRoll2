@@ -1,0 +1,33 @@
+[
+  {
+    "Author": "Anya Hichu",
+    "Name": "ChatDeathRoll",
+    "InternalName": "ChatDeathRoll",
+    "AssemblyVersion": "1.0.0.0",
+    "Description": "Provides link buttons in chat for death rolling",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/NeoGriever/ChatDeathRoll2",
+    "Tags": [
+      "deathroll",
+      "button",
+      "link",
+      "chat",
+      "helper"
+    ],
+    "DalamudApiLevel": 15,
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "CanUnloadAsync": false,
+    "LoadPriority": 0,
+    "Punchline": "Zero trust death rolling helper",
+    "Changelog": "- Added configurable /random and /dice replacement exclusions for matching active plugin windows.",
+    "AcceptsFeedback": true,
+    "DownloadLinkInstall": "https://raw.githubusercontent.com/NeoGriever/ChatDeathRoll2/master/plugins/ChatDeathRoll/latest.zip",
+    "IsHide": false,
+    "IsTestingExclusive": false,
+    "DownloadLinkTesting": "https://raw.githubusercontent.com/NeoGriever/ChatDeathRoll2/master/plugins/ChatDeathRoll/latest.zip",
+    "DownloadLinkUpdate": "https://raw.githubusercontent.com/NeoGriever/ChatDeathRoll2/master/plugins/ChatDeathRoll/latest.zip",
+    "DownloadCount": 0,
+    "LastUpdate": 1791584976
+  }
+]
